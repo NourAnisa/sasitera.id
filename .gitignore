@@ -23,11 +23,14 @@ wheels/
 .installed.cfg
 *.egg
 
-# OS Files
+# OS & Temp
 .DS_Store
 Thumbs.db
 ehthumbs.db
 [Nn]otebooks/.ipynb_checkpoints
+*.tmp
+*.log
+scratch/
 
 # IDE
 .vscode/
@@ -35,8 +38,23 @@ ehthumbs.db
 *.sublime-project
 *.sublime-workspace
 
-# Dataset Raw / Large Archives
+# Exclude ALL Word Reports & PDFs from GitHub
+*.docx
+*.doc
+*.pdf
+generate_final_report.py
+eq_helper.py
+
+# Raw / Intermediate Data & Augmented Datasets
+Dataset Motif Kain Sasirangan/
 Dataset Motif Kain Sasirangan.zip
-Dataset Motif Kain Sasirangan/Raw/
+data_industri_sasirangan.csv
+data_industri_sasirangan.xlsx
+data_industri_sasirangan_banjarmasin.csv
+build_frontend.py
+build_pages.py
+fix_standalone.py
+
+# Static Uploads
 static/uploads/*
 !static/uploads/.gitkeep
