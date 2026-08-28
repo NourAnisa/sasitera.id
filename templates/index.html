@@ -711,11 +711,11 @@
 
             const isDark = htmlEl.classList.contains('dark');
             const tileUrl = isDark 
-                ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-                : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+                ? 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}'
+                : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 
             tileLayer = L.tileLayer(tileUrl, {
-                attribution: '&copy; CARTO & Satu Data Banjarmasin &bull; SASITERA.ID',
+                attribution: '&copy; OpenStreetMap & Esri &bull; Satu Data Banjarmasin &bull; SASITERA.ID',
                 maxZoom: 19
             }).addTo(map);
 
@@ -727,11 +727,11 @@
                 map.removeLayer(tileLayer);
             }
             const tileUrl = theme === 'dark'
-                ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-                : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+                ? 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}'
+                : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 
             tileLayer = L.tileLayer(tileUrl, {
-                attribution: '&copy; CARTO & Satu Data Banjarmasin &bull; SASITERA.ID',
+                attribution: '&copy; OpenStreetMap & Esri &bull; Satu Data Banjarmasin &bull; SASITERA.ID',
                 maxZoom: 19
             }).addTo(map);
         }
