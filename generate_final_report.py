@@ -11,7 +11,7 @@ sys.stdout.reconfigure(encoding='utf-8')
 
 doc = docx.Document()
 
-# Configure Margins: Top 3cm, Bottom 3cm, Left 4cm, Right 3cm (A4 Standard)
+# Margins: Top 3cm, Bottom 3cm, Left 4cm, Right 3cm (A4 Standard)
 for section in doc.sections:
     section.top_margin = Inches(1.18)    # 3.0 cm
     section.bottom_margin = Inches(1.18) # 3.0 cm
@@ -76,6 +76,42 @@ def add_paragraph(text, indent=0.3):
     run.font.name = 'Times New Roman'
     run.font.size = Pt(12)
     return p
+
+def add_equation(eq_text, eq_number=None):
+    table = doc.add_table(rows=1, cols=2)
+    table.alignment = WD_TABLE_ALIGNMENT.CENTER
+    table.autofit = False
+    
+    cell_eq = table.rows[0].cells[0]
+    cell_num = table.rows[0].cells[1]
+    cell_eq.width = Inches(5.3)
+    cell_num.width = Inches(0.8)
+    
+    for cell in (cell_eq, cell_num):
+        tcPr = cell._tc.get_or_add_tcPr()
+        tcBorders = parse_xml(f'<w:tcBorders {nsdecls("w")}><w:top w:val="none"/><w:left w:val="none"/><w:bottom w:val="none"/><w:right w:val="none"/></w:tcBorders>')
+        tcPr.append(tcBorders)
+    
+    p_eq = cell_eq.paragraphs[0]
+    p_eq.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p_eq.paragraph_format.space_before = Pt(4)
+    p_eq.paragraph_format.space_after = Pt(4)
+    p_eq.paragraph_format.line_spacing = 1.15
+    run_eq = p_eq.add_run(eq_text)
+    run_eq.font.name = 'Times New Roman'
+    run_eq.font.size = Pt(11.5)
+    run_eq.italic = True
+    run_eq.bold = True
+    
+    p_num = cell_num.paragraphs[0]
+    p_num.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+    p_num.paragraph_format.space_before = Pt(4)
+    p_num.paragraph_format.space_after = Pt(4)
+    if eq_number:
+        run_num = p_num.add_run(f"({eq_number})")
+        run_num.font.name = 'Times New Roman'
+        run_num.font.size = Pt(11)
+        run_num.bold = True
 
 def set_cell_background(cell, color_hex):
     shading = parse_xml(f'<w:shd {nsdecls("w")} w:fill="{color_hex}"/>')
@@ -159,30 +195,37 @@ add_heading_2("2.2 Metode Analisis dan Pemodelan")
 add_heading_2("2.2.1 Arsitektur Convolutional Neural Network (CNN MobileNetV2)")
 add_paragraph("Pengenalan motif visual kain Sasirangan diimplementasikan menggunakan arsitektur Convolutional Neural Network berbasis MobileNetV2 yang dirancang oleh Sandler et al. [5]. Arsitektur ini dipilih karena memiliki efisiensi komputasi tinggi dan ukuran model yang sangat ringan (~8,8 MB) melalui implementasi Depthwise Separable Convolution dan Inverted Residual with Linear Bottleneck.")
 
-add_paragraph("Struktur komputasi Depthwise Separable Convolution memecah konvolusi standar menjadi dua tahap: konvolusi per saluran (Depthwise Convolution) yang dilanjutkan dengan konvolusi titik 1x1 (Pointwise Convolution). Reduksi biaya komputasi dinyatakan melalui persamaan efisiensi teoritis [5]:")
+add_paragraph("Struktur komputasi Depthwise Separable Convolution memecah konvolusi standar menjadi dua tahap: konvolusi per saluran (Depthwise Convolution) yang dilanjutkan dengan konvolusi titik 1x1 (Pointwise Convolution). Rasio reduksi biaya komputasi teoritis diformulasikan pada Persamaan (2.1) [5]:")
 
-add_paragraph("Reduksi Biaya = (D_K * D_K * M * D_F * D_F + M * N * D_F * D_F) / (D_K * D_K * M * N * D_F * D_F) = 1/N + 1/(D_K^2)", indent=0.4)
+add_equation("Rasio Reduksi = ( D_K * D_K * M * D_F^2 + M * N * D_F^2 ) / ( D_K^2 * M * N * D_F^2 ) = ( 1 / N ) + ( 1 / D_K^2 )", eq_number="2.1")
 
-add_paragraph("di mana D_K adalah ukuran kernel filter (3x3), M adalah jumlah kanal input, N adalah jumlah kanal output, dan D_F adalah dimensi spasial feature map. Dengan kernel 3x3, MobileNetV2 menghemat komputasi 8 hingga 9 kali lipat dibandingkan konvolusi standar tanpa mengorbankan representasi fitur spasial tekstur kain.")
+add_paragraph("di mana D_K merepresentasikan ukuran kernel filter spasial (3 x 3), M adalah jumlah kanal input, N adalah jumlah kanal filter output, dan D_F adalah dimensi resolusi feature map. Dengan ukuran kernel standar D_K = 3, mekanisme ini menghasilkan efisiensi komputasi 8 hingga 9 kali lebih hemat dibandingkan konvolusi konvensional.")
 
-add_paragraph("Lapisan classifier head dimodifikasi secara khusus untuk klasifikasi 4 kelas motif Sasirangan dengan struktur: Linear Layer (1280 -> 128) -> ReLU Activation -> Dropout (p = 0.3) -> Linear Layer (128 -> 4). Model dioptimasi menggunakan fungsi Cross-Entropy Loss multi-kelas:")
+add_paragraph("Lapisan classifier head dimodifikasi secara khusus untuk klasifikasi 4 kelas motif Sasirangan dengan struktur: Linear Layer (1280 -> 128) -> ReLU Activation -> Dropout (p = 0.3) -> Linear Layer (128 -> 4). Fungsi objektif pelatihan dioptimasi menggunakan Multi-Class Cross-Entropy Loss pada Persamaan (2.2):")
 
-add_paragraph("Loss = - sum_{c=1}^{C} y_c * log(y_hat_c)", indent=0.4)
+add_equation("L_{CE} = - sum_{c=1}^{C} y_c * ln( y_hat_c )", eq_number="2.2")
 
-add_paragraph("di mana C = 4 kelas motif, y_c adalah ground-truth biner (one-hot encoding), dan y_hat_c adalah probabilitas softmax. Pelatihan dijalankan selama 15 epoch menggunakan optimizer Adam dengan learning rate 0,0001 dan batch size = 16.")
+add_paragraph("di mana C = 4 kelas motif, y_c adalah label ground-truth biner (one-hot vector), dan y_hat_c adalah probabilitas kelas hasil normalisasi fungsi Softmax pada Persamaan (2.3):")
+
+add_equation("y_hat_c = exp( z_c ) / sum_{j=1}^{C} exp( z_j )", eq_number="2.3")
+
+add_paragraph("Pelatihan dijalankan selama 15 epoch menggunakan optimizer Adam dengan laju pembelajaran (learning rate) eta = 0,0001 dan ukuran batch (batch size) = 16.")
 
 add_heading_2("2.2.2 Analisis Daya Saing Spasial (Location Quotient)")
-add_paragraph("Untuk mengidentifikasi konsentrasi spasial dan derajat spesialisasi industri Sasirangan antar kecamatan, digunakan analisis ekonomi regional Location Quotient (LQ) [6]:")
+add_paragraph("Untuk mengukur derajat konsentrasi spasial dan spesialisasi industri Sasirangan pada tingkat kecamatan, digunakan formulasi Location Quotient (LQ) pada Persamaan (2.4) [6]:")
 
-add_paragraph("LQ_i = (e_i / e) / (E_i / E)", indent=0.4)
+add_equation("LQ_i = ( e_i / e ) / ( E_i / E )", eq_number="2.4")
 
-add_paragraph("di mana e_i adalah jumlah industri Sasirangan di kecamatan i, e adalah total industri Sasirangan di Kota Banjarmasin (249 unit), E_i adalah jumlah total UMKM di kecamatan i, dan E adalah total UMKM di seluruh Kota Banjarmasin (26.824 unit). Kriteria interpretasi LQ:")
-add_paragraph("• LQ > 1.0: Kecamatan memiliki konsentrasi spesialisasi relatif lebih tinggi dibandingkan rata-rata kota, mengindikasikan Sektor Basis Unggulan yang potensial menjadi pusat ekspor komparatif.", indent=0.4)
-add_paragraph("• LQ <= 1.0: Kecamatan berstatus Sektor Non-Basis, di mana keberadaan industri Sasirangan belum mencapai skala spesialisasi regional.", indent=0.4)
+add_paragraph("di mana e_i adalah jumlah industri Sasirangan di kecamatan i, e adalah total industri Sasirangan di Kota Banjarmasin (249 unit), E_i adalah jumlah total UMKM di kecamatan i, dan E adalah total UMKM di seluruh Kota Banjarmasin (26.824 unit). Interpretasi nilai:")
+add_paragraph("• LQ > 1.0 : Kecamatan berstatus Sektor Basis Unggulan (keunggulan komparatif tinggi).", indent=0.4)
+add_paragraph("• LQ <= 1.0: Kecamatan berstatus Sektor Non-Basis (belum mencapai skala spesialisasi).", indent=0.4)
 
 add_heading_2("2.2.3 Metrik Evaluasi Kinerja Model")
-add_paragraph("Kinerja inferensi model diuji menggunakan empat metrik evaluasi standar pembelajaran mesin: Accuracy, Precision, Recall, dan F1-Score berbasis Confusion Matrix [7]:")
-add_paragraph("Accuracy = (TP + TN) / (TP + TN + FP + FN), Precision = TP / (TP + FP), Recall = TP / (TP + FN), F1-Score = 2 * (Precision * Recall) / (Precision + Recall)", indent=0.4)
+add_paragraph("Kinerja model diuji menggunakan metrik evaluasi standar: Accuracy, Precision, Recall, dan F1-Score yang diformulasikan pada Persamaan (2.5a)-(2.5c) berbasis Confusion Matrix [7]:")
+
+add_equation("Accuracy = ( TP + TN ) / ( TP + TN + FP + FN )", eq_number="2.5a")
+add_equation("Precision = TP / ( TP + FP ) ,    Recall = TP / ( TP + FN )", eq_number="2.5b")
+add_equation("F1-Score = 2 * ( Precision * Recall ) / ( Precision + Recall )", eq_number="2.5c")
 
 doc.add_page_break()
 # -------------------------------------------------------------
@@ -294,7 +337,11 @@ r_cap2 = p_cap2.add_run("Tabel 3.2 Top 10 Kelurahan dengan Konsentrasi Aglomeras
 r_cap2.bold = True
 r_cap2.font.size = Pt(9.5)
 
-add_paragraph("Analisis distribusi Pareto pada Tabel 3.2 menunjukkan bahwa hanya 2 kelurahan (Seberang Mesjid dan Sungai Jingah) telah menguasai 35,34% (88 unit) dari total seluruh ekosistem industri Sasirangan di Kota Banjarmasin. Kelurahan Seberang Mesjid (dikenal sebagai Kampung Sasirangan) menjadi episentrum utama perajin, sementara Sungai Jingah berkembang pesat sebagai sentra kreatif berbasis kearifan lokal rumah adat Banjar. Uji korelasi Pearson antara jumlah industri dengan populasi UMKM umum menghasilkan nilai r = -0,3212 (p = 0,5982), yang menegaskan bahwa sebaran industri Sasirangan tidak mengikuti pola pertumbuhan bisnis umum, melainkan terkonsentrasi spasial akibat faktor kultural historis dan aksesibilitas sungai.")
+add_paragraph("Analisis distribusi Pareto pada Tabel 3.2 menunjukkan bahwa hanya 2 kelurahan (Seberang Mesjid dan Sungai Jingah) telah menguasai 35,34% (88 unit) dari total seluruh ekosistem industri Sasirangan di Kota Banjarmasin. Uji korelasi Pearson antara jumlah industri (X) dengan populasi UMKM umum (Y) diformulasikan pada Persamaan (3.1) [12]:")
+
+add_equation("r = sum( ( X_i - X_bar ) * ( Y_i - Y_bar ) ) / sqrt( sum( X_i - X_bar )^2 * sum( Y_i - Y_bar )^2 )", eq_number="3.1")
+
+add_paragraph("Hasil uji komputasi menghasilkan nilai r = -0,3212 (p-value = 0,5982), yang menegaskan bahwa sebaran industri Sasirangan tidak berkorelasi linier dengan populasi usaha umum, melainkan terkonsentrasi spasial akibat faktor kultural historis dan aksesibilitas sungai Martapura.")
 
 if os.path.exists("static/img/spasial_location_quotient.png"):
     doc.add_picture("static/img/spasial_location_quotient.png", width=Inches(5.5))
@@ -365,6 +412,7 @@ add_heading_2("3.4 Implementasi Platform Terpadu SASITERA.ID")
 add_paragraph("Seluruh model kecerdasan buatan dan hasil pemodelan spasial diintegrasikan ke dalam platform web modern SASITERA.ID (https://nouranisa.github.io/sasitera.id/). Sistem ini dirancang menggunakan arsitektur modular berbasis Tailwind CSS, Flask, Leaflet GIS (dengan peta OpenStreetMap & Esri bebas watermark), serta mendukung fitur pengalih tema ganda (Light Mode & Dark Mode) yang responsif.")
 
 doc.add_page_break()
+
 # -------------------------------------------------------------
 # 6. BAB IV: REKOMENDASI KEBIJAKAN (EVIDENCE-BASED POLICY)
 # -------------------------------------------------------------
