@@ -1,0 +1,883 @@
+﻿<!DOCTYPE html>
+<html lang="id" class="scroll-smooth dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SASITERA.ID — A New Story Is Being Made | AI & Spatial Geodashboard</title>
+    
+    <!-- Tailwind CSS CDN with darkMode config -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        sasitera: {
+                            deep: '#070c18',
+                            navy: '#0d1829',
+                            card: '#132238',
+                            gold: '#d4af37',
+                            goldlight: '#fde047',
+                            goldwarm: '#eab308',
+                            denim: '#1e3a5f',
+                            cyan: '#38bdf8'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        serif: ['Playfair Display', 'Georgia', 'serif'],
+                        cinzel: ['Cinzel', 'Playfair Display', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800;900&family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,600&display=swap" rel="stylesheet">
+    
+    <!-- Leaflet CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* Dark Mode Glass */
+        .dark .glass {
+            background: rgba(13, 24, 41, 0.88);
+            backdrop-filter: blur(14px);
+            border: 1px solid rgba(212, 175, 55, 0.18);
+        }
+        .dark .glass-card {
+            background: rgba(19, 34, 56, 0.78);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(212, 175, 55, 0.15);
+        }
+        .dark .pattern-bg {
+            background-color: #070c18;
+            background-image: 
+                radial-gradient(rgba(212, 175, 55, 0.15) 1px, transparent 0),
+                radial-gradient(rgba(56, 189, 248, 0.08) 1px, #070c18 0);
+            background-size: 24px 24px;
+            background-position: 0 0, 12px 12px;
+        }
+
+        /* Light Mode Glass */
+        html:not(.dark) .glass {
+            background: rgba(255, 255, 255, 0.90);
+            backdrop-filter: blur(14px);
+            border: 1px solid rgba(217, 119, 6, 0.20);
+            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+        }
+        html:not(.dark) .glass-card {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(226, 232, 240, 0.9);
+            box-shadow: 0 4px 25px -3px rgba(0, 0, 0, 0.06), 0 2px 10px -2px rgba(0, 0, 0, 0.03);
+        }
+        html:not(.dark) .pattern-bg {
+            background-color: #f8fafc;
+            background-image: 
+                radial-gradient(rgba(217, 119, 6, 0.15) 1px, transparent 0),
+                radial-gradient(rgba(2, 132, 199, 0.08) 1px, #f8fafc 0);
+            background-size: 24px 24px;
+            background-position: 0 0, 12px 12px;
+        }
+
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #92400e 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .dark .gold-gradient-text {
+            background: linear-gradient(135deg, #fef08a 0%, #d4af37 50%, #b45309 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 4px; }
+        .dark ::-webkit-scrollbar-thumb { background: #1e3a5f; }
+        ::-webkit-scrollbar-thumb:hover { background: #d97706; }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-[#070c18] text-slate-800 dark:text-slate-100 font-sans min-h-screen antialiased pattern-bg transition-colors duration-300">
+
+    <!-- NAVBAR -->
+    <header class="sticky top-0 z-50 glass border-b border-slate-200 dark:border-amber-500/20 shadow-md dark:shadow-xl transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <!-- Brand Logo -->
+                <div class="flex items-center space-x-3">
+                    <a href="#hero" class="flex items-center space-x-3 group">
+                        <div class="h-12 w-12 rounded-xl bg-gradient-to-tr from-amber-600 via-amber-400 to-yellow-200 p-0.5 shadow-lg shadow-amber-500/20 group-hover:scale-105 transition">
+                            <div class="w-full h-full bg-slate-900 rounded-[10px] flex items-center justify-center p-1">
+                                <img src="/static/img/sasitera_logo.png" alt="SASITERA.ID" class="max-h-full max-w-full object-contain" onerror="this.onerror=null; this.src='/static/img/sasitera_brand.png'"/>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex items-center space-x-2">
+                                <span class="font-black text-2xl tracking-wider font-cinzel gold-gradient-text">SASITERA.ID</span>
+                                <span class="bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Official</span>
+                            </div>
+                            <p class="text-[11px] text-slate-600 dark:text-slate-400 font-medium tracking-wide">A NEW STORY IS BEING MADE &bull; Datathon 2026</p>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Navigation Links -->
+                <nav class="hidden md:flex items-center space-x-1 lg:space-x-2">
+                    <a href="#hero" class="px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-amber-600 dark:hover:text-amber-300 hover:bg-slate-100 dark:hover:bg-slate-800/50 rounded-lg transition">Beranda</a>
+                    <a href="#ai-classifier" class="px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-amber-600 dark:hover:text-amber-300 hover:bg-slate-100 dark:hover:bg-slate-800/50 rounded-lg transition flex items-center gap-1.5">
+                        <i data-lucide="sparkles" class="w-4 h-4 text-amber-500 dark:text-amber-400"></i>
+                        <span>AI Vision</span>
+                    </a>
+                    <a href="#spatial-map" class="px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-amber-600 dark:hover:text-amber-300 hover:bg-slate-100 dark:hover:bg-slate-800/50 rounded-lg transition flex items-center gap-1.5">
+                        <i data-lucide="map-pin" class="w-4 h-4 text-cyan-600 dark:text-cyan-400"></i>
+                        <span>Peta Spasial</span>
+                    </a>
+                    <a href="#analytics" class="px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-amber-600 dark:hover:text-amber-300 hover:bg-slate-100 dark:hover:bg-slate-800/50 rounded-lg transition flex items-center gap-1.5">
+                        <i data-lucide="bar-chart-3" class="w-4 h-4 text-amber-600 dark:text-amber-400"></i>
+                        <span>Statistik</span>
+                    </a>
+                    <a href="#data-table" class="px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-amber-600 dark:hover:text-amber-300 hover:bg-slate-100 dark:hover:bg-slate-800/50 rounded-lg transition flex items-center gap-1.5">
+                        <i data-lucide="database" class="w-4 h-4 text-blue-600 dark:text-blue-400"></i>
+                        <span>249 IKM</span>
+                    </a>
+                </nav>
+
+                <!-- Actions: Theme Toggle & Instagram -->
+                <div class="flex items-center space-x-2.5">
+                    <!-- Light / Dark Mode Toggle Button -->
+                    <button id="theme-toggle" class="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/80 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-amber-400 transition shadow-sm" title="Ganti Mode Terang / Gelap">
+                        <i id="theme-icon" data-lucide="moon" class="w-4 h-4"></i>
+                    </button>
+
+                    <a href="https://www.instagram.com/sasitera.id/" target="_blank" class="inline-flex items-center space-x-1.5 bg-gradient-to-r from-pink-500/10 via-purple-500/10 to-amber-500/10 hover:from-pink-500/20 hover:to-amber-500/20 border border-pink-500/30 dark:border-amber-500/40 text-xs text-pink-700 dark:text-amber-300 font-semibold px-3 py-2 rounded-xl transition shadow-sm">
+                        <i data-lucide="instagram" class="w-4 h-4 text-pink-600 dark:text-pink-400"></i>
+                        <span class="hidden sm:inline">@sasitera.id</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- HERO SECTION -->
+    <section id="hero" class="relative pt-12 pb-20 overflow-hidden border-b border-slate-200 dark:border-amber-500/20">
+        <div class="absolute inset-0 bg-gradient-to-b from-amber-500/5 dark:from-amber-500/10 via-transparent to-transparent pointer-events-none"></div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                
+                <!-- Left Hero Text -->
+                <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
+                    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-300 text-xs font-bold uppercase tracking-widest">
+                        <span>◆ INTRODUCING ◆</span>
+                    </div>
+
+                    <h1 class="text-4xl sm:text-6xl font-black font-serif tracking-tight text-slate-900 dark:text-white leading-tight">
+                        <span class="gold-gradient-text font-cinzel">SASITERA.ID</span><br/>
+                        <span class="text-2xl sm:text-4xl font-normal italic text-slate-700 dark:text-slate-200">A New Story Is Being Made</span>
+                    </h1>
+
+                    <p class="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl text-justify lg:text-left">
+                        Platform kecerdasan buatan dan geodashboard spasial untuk <strong>preservasi motif legendaris Sasirangan</strong> serta akselerasi ekosistem <strong>249 industri tekstil & UMKM kreatif</strong> di Kota Seribu Sungai Banjarmasin.
+                    </p>
+
+                    <div class="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-2">
+                        <a href="#ai-classifier" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-300 hover:from-amber-400 hover:to-yellow-200 text-slate-950 font-extrabold text-sm shadow-xl shadow-amber-500/25 transition transform hover:-translate-y-0.5">
+                            <i data-lucide="scan" class="w-5 h-5"></i>
+                            <span>Klasifikasi AI Motif</span>
+                        </a>
+                        <a href="#spatial-map" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-white dark:bg-slate-900/90 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-300 dark:border-amber-500/30 text-slate-800 dark:text-slate-100 font-semibold text-sm transition transform hover:-translate-y-0.5 shadow-md">
+                            <i data-lucide="map" class="w-5 h-5 text-cyan-600 dark:text-cyan-400"></i>
+                            <span>Peta Sentra IKM</span>
+                        </a>
+                        <a href="https://www.instagram.com/sasitera.id/" target="_blank" class="inline-flex items-center gap-2 px-5 py-3.5 rounded-xl bg-gradient-to-r from-pink-500/10 to-purple-500/10 dark:from-pink-600/30 dark:to-purple-600/30 hover:from-pink-500/20 hover:to-purple-500/20 border border-pink-400/40 dark:border-pink-500/40 text-pink-700 dark:text-pink-300 font-semibold text-sm transition">
+                            <i data-lucide="instagram" class="w-5 h-5"></i>
+                            <span>Follow @sasitera.id</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Right Hero Image Showcase -->
+                <div class="lg:col-span-5 flex justify-center">
+                    <div class="relative group max-w-sm rounded-3xl p-2 bg-gradient-to-tr from-amber-500 via-amber-300 to-yellow-200 shadow-2xl shadow-amber-500/20">
+                        <div class="rounded-[22px] overflow-hidden bg-slate-900">
+                            <img src="/static/img/sasitera_brand.png" alt="SASITERA.ID" class="w-full h-auto object-cover transform group-hover:scale-105 transition duration-500"/>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- KPI Cards -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-16">
+                <div class="glass-card p-5 rounded-2xl border border-slate-200 dark:border-amber-500/20 hover:border-amber-500/40 transition group">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Akurasi Model Vision AI</span>
+                        <div class="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-600 dark:text-amber-300">
+                            <i data-lucide="cpu" class="w-4 h-4"></i>
+                        </div>
+                    </div>
+                    <div class="text-3xl font-extrabold text-slate-900 dark:text-white">87.8%</div>
+                    <p class="text-xs text-amber-700 dark:text-amber-300/80 mt-1">MobileNetV2 CNN Architecture</p>
+                </div>
+
+                <div class="glass-card p-5 rounded-2xl border border-slate-200 dark:border-amber-500/20 hover:border-amber-500/40 transition group">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Direktori IKM Terdata</span>
+                        <div class="w-8 h-8 rounded-lg bg-cyan-500/10 flex items-center justify-center text-cyan-600 dark:text-cyan-400">
+                            <i data-lucide="building-2" class="w-4 h-4"></i>
+                        </div>
+                    </div>
+                    <div class="text-3xl font-extrabold text-cyan-600 dark:text-cyan-400" id="kpi-total-industries">249 Unit</div>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Satu Data Kota Banjarmasin</p>
+                </div>
+
+                <div class="glass-card p-5 rounded-2xl border border-slate-200 dark:border-amber-500/20 hover:border-amber-500/40 transition group">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Sentra Terpadat</span>
+                        <div class="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+                            <i data-lucide="map-pin" class="w-4 h-4"></i>
+                        </div>
+                    </div>
+                    <div class="text-2xl font-extrabold text-slate-900 dark:text-white">Seberang Mesjid</div>
+                    <p class="text-xs text-emerald-700 dark:text-emerald-400/80 mt-1">49 Pengrajin (Kampung Sasirangan)</p>
+                </div>
+
+                <div class="glass-card p-5 rounded-2xl border border-slate-200 dark:border-amber-500/20 hover:border-amber-500/40 transition group">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Klasifikasi Motif</span>
+                        <div class="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-600 dark:text-purple-400">
+                            <i data-lucide="palette" class="w-4 h-4"></i>
+                        </div>
+                    </div>
+                    <div class="text-3xl font-extrabold text-amber-600 dark:text-amber-300">4 Motif</div>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Gelombang, Hiris, Kembang, Dayang</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MAIN APP CONTENT -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-20">
+
+        <!-- 1. AI MOTIF CLASSIFICATION ENGINE -->
+        <section id="ai-classifier" class="scroll-mt-24">
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+                <div>
+                    <div class="inline-flex items-center gap-2 text-amber-600 dark:text-amber-400 text-xs font-bold uppercase tracking-wider mb-2">
+                        <i data-lucide="sparkles" class="w-4 h-4"></i>
+                        <span>Vision AI Recognition Engine</span>
+                    </div>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white font-serif">Klasifikasi Otomatis Motif Sasirangan</h2>
+                    <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">Otentikasi cerdas untuk mengenali keaslian motif tradisional Banjar beserta filosofi budayanya.</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="inline-flex items-center gap-1.5 bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-300 text-xs px-3.5 py-1.5 rounded-xl font-semibold">
+                        <span class="w-2 h-2 rounded-full bg-amber-500 dark:bg-amber-400 animate-pulse"></span>
+                        SASITERA Vision Active
+                    </span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <!-- Upload & Sample Panel (Left) -->
+                <div class="lg:col-span-5 space-y-6">
+                    <div id="dropzone" class="glass-card rounded-3xl border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-amber-500 dark:hover:border-amber-400/80 p-6 text-center cursor-pointer transition flex flex-col items-center justify-center min-h-[230px] relative overflow-hidden group">
+                        <input type="file" id="file-input" class="hidden" accept="image/*" />
+                        <div id="upload-prompt" class="space-y-3">
+                            <div class="w-14 h-14 rounded-2xl bg-amber-500/15 text-amber-600 dark:text-amber-400 flex items-center justify-center mx-auto group-hover:scale-110 transition">
+                                <i data-lucide="upload-cloud" class="w-7 h-7"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold text-slate-800 dark:text-slate-200">Klik untuk Unggah atau Tarik Foto ke Sini</p>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Format JPG, PNG, JPEG (Maksimal 10 MB)</p>
+                            </div>
+                        </div>
+                        <img id="image-preview" class="hidden max-h-[210px] w-auto rounded-2xl object-contain shadow-2xl" alt="Preview"/>
+                    </div>
+
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Atau Pilih Sampel Pengujian Cepat:</span>
+                        </div>
+                        <div class="grid grid-cols-4 gap-2" id="sample-gallery"></div>
+                    </div>
+                </div>
+
+                <!-- Prediction & Cultural Metadata (Right) -->
+                <div class="lg:col-span-7">
+                    <div id="prediction-placeholder" class="glass-card rounded-3xl p-8 border border-slate-200 dark:border-slate-800 h-full flex flex-col items-center justify-center text-center space-y-4">
+                        <div class="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800/80 flex items-center justify-center text-amber-500 dark:text-amber-400">
+                            <i data-lucide="sparkles" class="w-8 h-8"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-slate-800 dark:text-slate-200">Belum Ada Gambar yang Dianalisis</h3>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 max-w-sm mt-1">Silakan unggah foto kain Sasirangan atau klik salah satu sampel di sebelah kiri untuk melihat hasil prediksi AI.</p>
+                        </div>
+                    </div>
+
+                    <div id="prediction-result" class="hidden glass-card rounded-3xl p-6 sm:p-8 border border-amber-500/40 space-y-6">
+                        <div class="flex items-start justify-between border-b border-slate-200 dark:border-slate-800 pb-5">
+                            <div>
+                                <span class="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">Hasil Klasifikasi Vision AI</span>
+                                <h3 id="res-motif-name" class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white font-serif mt-1">MOTIF GELOMBANG</h3>
+                                <p id="res-symbolic" class="text-xs text-emerald-700 dark:text-emerald-400 font-medium mt-0.5">Makna: Ketabahan & Dinamika Kehidupan</p>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-xs text-slate-500 dark:text-slate-400">Confidence</span>
+                                <div id="res-confidence" class="text-3xl font-black text-amber-600 dark:text-amber-400 font-mono">96.4%</div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2.5">
+                            <span class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Distribusi Probabilitas:</span>
+                            <div class="space-y-2" id="prob-bars"></div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                            <div class="bg-slate-50 dark:bg-slate-900/80 rounded-2xl p-4 border border-slate-200 dark:border-slate-800">
+                                <div class="flex items-center gap-2 text-amber-700 dark:text-amber-300 text-xs font-bold mb-1.5">
+                                    <i data-lucide="book-open" class="w-4 h-4"></i>
+                                    <span>Filosofi Budaya Banjar</span>
+                                </div>
+                                <p id="res-philosophy" class="text-xs text-slate-700 dark:text-slate-300 leading-relaxed text-justify">-</p>
+                            </div>
+
+                            <div class="bg-slate-50 dark:bg-slate-900/80 rounded-2xl p-4 border border-slate-200 dark:border-slate-800 space-y-2.5">
+                                <div>
+                                    <div class="flex items-center gap-2 text-cyan-700 dark:text-cyan-400 text-xs font-bold mb-1">
+                                        <i data-lucide="scissors" class="w-3.5 h-3.5"></i>
+                                        <span>Teknik Jahit Jelujur</span>
+                                    </div>
+                                    <p id="res-technique" class="text-xs text-slate-700 dark:text-slate-300">-</p>
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-2 text-purple-700 dark:text-purple-400 text-xs font-bold mb-1">
+                                        <i data-lucide="palette" class="w-3.5 h-3.5"></i>
+                                        <span>Palet Warna Khas</span>
+                                    </div>
+                                    <div id="res-colors" class="flex flex-wrap gap-1.5"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- 2. SPATIAL GEODASHBOARD SECTION -->
+        <section id="spatial-map" class="scroll-mt-24">
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+                <div>
+                    <div class="inline-flex items-center gap-2 text-cyan-600 dark:text-cyan-400 text-xs font-bold uppercase tracking-wider mb-2">
+                        <i data-lucide="map" class="w-4 h-4"></i>
+                        <span>Geographic Information System</span>
+                    </div>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white font-serif">Peta Sebaran Spasial Sentra IKM Sasirangan</h2>
+                    <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">Pemetaan sebaran 249 unit industri Sasirangan dan ekosistem tekstil kreatif di 5 kecamatan Kota Banjarmasin.</p>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-3">
+                    <select id="map-filter-kecamatan" class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-amber-500/30 text-slate-800 dark:text-slate-200 text-xs rounded-xl px-3 py-2.5 focus:ring-amber-500 focus:border-amber-500 shadow-sm">
+                        <option value="all">Semua Kecamatan (5)</option>
+                        <option value="Banjarmasin Tengah">Banjarmasin Tengah (91)</option>
+                        <option value="Banjarmasin Utara">Banjarmasin Utara (73)</option>
+                        <option value="Banjarmasin Timur">Banjarmasin Timur (38)</option>
+                        <option value="Banjarmasin Barat">Banjarmasin Barat (32)</option>
+                        <option value="Banjarmasin Selatan">Banjarmasin Selatan (15)</option>
+                    </select>
+
+                    <select id="map-filter-kategori" class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-amber-500/30 text-slate-800 dark:text-slate-200 text-xs rounded-xl px-3 py-2.5 focus:ring-amber-500 focus:border-amber-500 shadow-sm">
+                        <option value="all">Semua Kategori</option>
+                        <option value="Sasirangan & Batik">Sasirangan & Batik (220)</option>
+                        <option value="Tekstil / Fashion / Kerajinan Lain">Ekosistem Pendukung (29)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-3xl p-2.5 border border-slate-200 dark:border-amber-500/30 overflow-hidden shadow-xl relative">
+                <div id="map" class="h-[520px] w-full rounded-2xl z-10"></div>
+                
+                <div class="absolute bottom-6 right-6 z-20 glass p-3.5 rounded-2xl border border-slate-300 dark:border-amber-500/30 shadow-lg text-xs space-y-2 max-w-xs">
+                    <span class="font-bold text-slate-800 dark:text-slate-200 block mb-1">Legenda Titik Industri</span>
+                    <div class="flex items-center gap-2">
+                        <span class="w-3.5 h-3.5 rounded-full bg-amber-500 border border-amber-300"></span>
+                        <span class="text-slate-700 dark:text-slate-300">Sentra Sasirangan & Batik (KBLI 13134 / 13132)</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="w-3.5 h-3.5 rounded-full bg-cyan-500 border border-cyan-300"></span>
+                        <span class="text-slate-700 dark:text-slate-300">Konveksi, Bordir & Fashion Apparel</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. STATISTICAL ANALYTICS -->
+        <section id="analytics" class="scroll-mt-24">
+            <div class="mb-8">
+                <div class="inline-flex items-center gap-2 text-amber-600 dark:text-amber-400 text-xs font-bold uppercase tracking-wider mb-2">
+                    <i data-lucide="pie-chart" class="w-4 h-4"></i>
+                    <span>Analisis Statistik & Sektoral</span>
+                </div>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white font-serif">Struktur Ekonomi & Aglomerasi Sentra</h2>
+                <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">Eksplorasi data sektoral berbasis Portal Satu Data Kota Banjarmasin.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <div class="lg:col-span-6 glass-card rounded-3xl p-6 border border-slate-200 dark:border-slate-800">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200">Sebaran Industri Kreatif per Kecamatan</h3>
+                        <span class="text-xs text-amber-600 dark:text-amber-400 font-bold">Total: 249 Unit</span>
+                    </div>
+                    <div class="h-64">
+                        <canvas id="chartKecamatan"></canvas>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-6 glass-card rounded-3xl p-6 border border-slate-200 dark:border-slate-800">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200">Top 6 Kelurahan Aglomerasi Sasirangan</h3>
+                        <span class="text-xs text-cyan-600 dark:text-cyan-400 font-bold">Titik Hotspot Klaster</span>
+                    </div>
+                    <div class="h-64">
+                        <canvas id="chartKelurahan"></canvas>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-12 glass-card rounded-3xl p-6 border border-slate-200 dark:border-slate-800">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h3 class="text-base font-bold text-slate-800 dark:text-slate-200 font-serif">Evaluasi Metrik Model AI (Training Curve & Confusion Matrix)</h3>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Hasil pengujian empiris Convolutional Neural Network pada 4 kelas motif kain Sasirangan</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                        <div class="bg-slate-50 dark:bg-slate-900/80 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 text-center">
+                            <img src="/static/img/training_curves.png" alt="Kurva Pelatihan" class="w-full h-auto rounded-xl shadow" onerror="this.src='https://placehold.co/600x300/1e293b/ffffff?text=Training+Curves'"/>
+                            <p class="text-xs text-slate-600 dark:text-slate-400 mt-2 font-medium">Kurva Akurasi & Loss Pelatihan (15 Epochs)</p>
+                        </div>
+                        <div class="bg-slate-50 dark:bg-slate-900/80 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 text-center">
+                            <img src="/static/img/confusion_matrix.png" alt="Confusion Matrix" class="w-full h-auto rounded-xl shadow" onerror="this.src='https://placehold.co/600x300/1e293b/ffffff?text=Confusion+Matrix'"/>
+                            <p class="text-xs text-slate-600 dark:text-slate-400 mt-2 font-medium">Confusion Matrix Pengenalan 4 Motif Tradisional</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. DATASET EXPLORER TABLE (249 IKM) -->
+        <section id="data-table" class="scroll-mt-24">
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+                <div>
+                    <div class="inline-flex items-center gap-2 text-amber-600 dark:text-amber-400 text-xs font-bold uppercase tracking-wider mb-2">
+                        <i data-lucide="database" class="w-4 h-4"></i>
+                        <span>Direktori Data Terbuka</span>
+                    </div>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white font-serif">Eksplorasi Data 249 Industri</h2>
+                    <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">Pangkalan data riil industri tekstil & Sasirangan hasil scraping Portal Satu Data Kota Banjarmasin.</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <input type="text" id="table-search" placeholder="Cari nama industri, pemilik, alamat..." class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-amber-500/30 text-slate-800 dark:text-slate-200 text-xs rounded-xl px-3.5 py-2.5 w-64 focus:ring-amber-500 focus:border-amber-500 shadow-sm"/>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-3xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-lg">
+                <div class="overflow-x-auto max-h-[420px]">
+                    <table class="w-full text-left text-xs text-slate-700 dark:text-slate-300" id="industries-table">
+                        <thead class="bg-slate-100 dark:bg-[#0b1424] text-slate-600 dark:text-slate-400 uppercase tracking-wider sticky top-0 border-b border-slate-200 dark:border-slate-800">
+                            <tr>
+                                <th class="px-4 py-3.5">No</th>
+                                <th class="px-4 py-3.5">Nama Industri</th>
+                                <th class="px-4 py-3.5">Pemilik / PJ</th>
+                                <th class="px-4 py-3.5">Kecamatan</th>
+                                <th class="px-4 py-3.5">Kelurahan</th>
+                                <th class="px-4 py-3.5">Alamat</th>
+                                <th class="px-4 py-3.5">Klasifikasi KBLI</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200 dark:divide-slate-800/80" id="table-body"></tbody>
+                    </table>
+                </div>
+                <div class="bg-slate-100/80 dark:bg-[#0b1424] px-4 py-3 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+                    <span id="table-count-label">Menampilkan 249 dari 249 industri</span>
+                    <div class="flex gap-2">
+                        <span class="inline-flex items-center gap-1 text-amber-600 dark:text-amber-400 font-semibold"><i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> Terverifikasi Portal Satu Data</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-slate-200 dark:border-amber-500/20 bg-slate-100 dark:bg-[#050912] py-14 text-slate-600 dark:text-slate-400 text-xs transition-colors">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
+            <div class="space-y-1">
+                <div class="flex items-center justify-center md:justify-start gap-2">
+                    <span class="font-extrabold text-base gold-gradient-text font-cinzel tracking-wider">SASITERA.ID</span>
+                    <span class="text-slate-400 dark:text-slate-500">&bull;</span>
+                    <span class="text-slate-700 dark:text-slate-300 font-medium italic">A New Story Is Being Made</span>
+                </div>
+                <p class="text-slate-500 dark:text-slate-400 text-[11px]">Banjarmasin Datathon 2026 &bull; Dinas Komunikasi, Informatika dan Statistik Kota Banjarmasin</p>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <a href="https://www.instagram.com/sasitera.id/" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-pink-500/10 hover:bg-pink-500/20 dark:bg-pink-900/20 dark:hover:bg-pink-900/40 border border-pink-400/30 text-pink-700 dark:text-pink-300 font-semibold transition">
+                    <i data-lucide="instagram" class="w-4 h-4 text-pink-600 dark:text-pink-400"></i>
+                    <span>Instagram: @sasitera.id</span>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC & THEME SWITCHER -->
+    <script>
+        lucide.createIcons();
+
+        let allIndustries = [];
+        let map, markersLayer, tileLayer;
+
+        // Theme management
+        const htmlEl = document.documentElement;
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+
+        function initTheme() {
+            const savedTheme = localStorage.getItem('sasitera-theme') || 'dark';
+            applyTheme(savedTheme);
+        }
+
+        function applyTheme(theme) {
+            if (theme === 'dark') {
+                htmlEl.classList.add('dark');
+                themeIcon.setAttribute('data-lucide', 'sun');
+            } else {
+                htmlEl.classList.remove('dark');
+                themeIcon.setAttribute('data-lucide', 'moon');
+            }
+            localStorage.setItem('sasitera-theme', theme);
+            lucide.createIcons();
+
+            // Update map tilelayer if map is initialized
+            if (map) {
+                updateMapTiles(theme);
+            }
+        }
+
+        themeToggleBtn.addEventListener('click', () => {
+            const isDark = htmlEl.classList.contains('dark');
+            applyTheme(isDark ? 'light' : 'dark');
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            initSamples();
+            initMap();
+            fetchStatsAndCharts();
+            fetchIndustries();
+            setupEventListeners();
+        });
+
+        async function initSamples() {
+            try {
+                const res = await fetch('/api/samples');
+                const samples = await res.json();
+                const container = document.getElementById('sample-gallery');
+                container.innerHTML = '';
+                
+                samples.slice(0, 4).forEach((s) => {
+                    const div = document.createElement('div');
+                    div.className = 'group relative rounded-2xl overflow-hidden border border-slate-300 dark:border-amber-500/30 hover:border-amber-500 cursor-pointer transition aspect-square bg-slate-100 dark:bg-[#0b1424] shadow-sm';
+                    div.innerHTML = `
+                        <img src="${s.url}" alt="${s.label}" class="w-full h-full object-cover group-hover:scale-110 transition duration-300"/>
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-transparent to-transparent flex items-end p-1.5">
+                            <span class="text-[9px] font-bold text-amber-300 truncate">${s.label}</span>
+                        </div>
+                    `;
+                    div.onclick = () => classifySample(s.url);
+                    container.appendChild(div);
+                });
+            } catch (err) {
+                console.error("Error loading samples:", err);
+            }
+        }
+
+        async function classifySample(sampleUrl) {
+            showLoadingPrediction();
+            try {
+                const res = await fetch('/api/classify', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ sample_url: sampleUrl })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    renderPrediction(data);
+                } else {
+                    alert(data.error || 'Terjadi kesalahan klasifikasi.');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Gagal menghubungi server klasifikasi.');
+            }
+        }
+
+        async function classifyFile(file) {
+            showLoadingPrediction();
+            const formData = new FormData();
+            formData.append('file', file);
+            try {
+                const res = await fetch('/api/classify', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                if (data.success) {
+                    renderPrediction(data);
+                } else {
+                    alert(data.error || 'Gagal memproses gambar.');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Gagal mengunggah gambar.');
+            }
+        }
+
+        function showLoadingPrediction() {
+            document.getElementById('prediction-placeholder').classList.remove('hidden');
+            document.getElementById('prediction-placeholder').innerHTML = `
+                <div class="animate-spin w-10 h-10 border-4 border-amber-500 border-t-transparent rounded-full mx-auto"></div>
+                <p class="text-sm font-semibold text-amber-600 dark:text-amber-300 mt-3 font-serif">Menganalisis Pola Citra Vision AI SASITERA...</p>
+            `;
+            document.getElementById('prediction-result').classList.add('hidden');
+        }
+
+        function renderPrediction(data) {
+            document.getElementById('prediction-placeholder').classList.add('hidden');
+            const resultBox = document.getElementById('prediction-result');
+            resultBox.classList.remove('hidden');
+
+            document.getElementById('res-motif-name').innerText = data.details.nama || data.predicted_motif;
+            document.getElementById('res-symbolic').innerText = `Makna: ${data.details.makna_simbolik || '-'}`;
+            document.getElementById('res-confidence').innerText = `${data.confidence}%`;
+            document.getElementById('res-philosophy').innerText = data.details.filosofi || '-';
+            document.getElementById('res-technique').innerText = data.details.teknik_jelujur || '-';
+
+            const colorsContainer = document.getElementById('res-colors');
+            colorsContainer.innerHTML = '';
+            (data.details.warna_khas || []).forEach(c => {
+                const span = document.createElement('span');
+                span.className = 'px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[10px] text-amber-800 dark:text-amber-200 font-medium';
+                span.innerText = c;
+                colorsContainer.appendChild(span);
+            });
+
+            const probBars = document.getElementById('prob-bars');
+            probBars.innerHTML = '';
+            Object.entries(data.probabilities).forEach(([motif, prob]) => {
+                const isWinner = motif === data.predicted_motif;
+                const bar = document.createElement('div');
+                bar.className = 'space-y-1';
+                bar.innerHTML = `
+                    <div class="flex justify-between text-xs font-medium ${isWinner ? 'text-amber-600 dark:text-amber-300 font-bold' : 'text-slate-500 dark:text-slate-400'}">
+                        <span>${motif}</span>
+                        <span>${prob}%</span>
+                    </div>
+                    <div class="w-full bg-slate-200 dark:bg-slate-800/80 rounded-full h-2 overflow-hidden">
+                        <div class="${isWinner ? 'bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-300' : 'bg-slate-400 dark:bg-slate-600'} h-2 rounded-full transition-all duration-500" style="width: ${prob}%"></div>
+                    </div>
+                `;
+                probBars.appendChild(bar);
+            });
+
+            const imgPreview = document.getElementById('image-preview');
+            imgPreview.src = data.image_url;
+            imgPreview.classList.remove('hidden');
+            document.getElementById('upload-prompt').classList.add('hidden');
+        }
+
+        function initMap() {
+            map = L.map('map', { zoomControl: false }).setView([-3.3194, 114.5908], 13);
+            L.control.zoom({ position: 'topright' }).addTo(map);
+
+            const isDark = htmlEl.classList.contains('dark');
+            const tileUrl = isDark 
+                ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+                : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+
+            tileLayer = L.tileLayer(tileUrl, {
+                attribution: '&copy; CARTO & Satu Data Banjarmasin &bull; SASITERA.ID',
+                maxZoom: 19
+            }).addTo(map);
+
+            markersLayer = L.layerGroup().addTo(map);
+        }
+
+        function updateMapTiles(theme) {
+            if (tileLayer) {
+                map.removeLayer(tileLayer);
+            }
+            const tileUrl = theme === 'dark'
+                ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+                : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+
+            tileLayer = L.tileLayer(tileUrl, {
+                attribution: '&copy; CARTO & Satu Data Banjarmasin &bull; SASITERA.ID',
+                maxZoom: 19
+            }).addTo(map);
+        }
+
+        async function fetchIndustries() {
+            const kec = document.getElementById('map-filter-kecamatan').value;
+            const kat = document.getElementById('map-filter-kategori').value;
+            const search = document.getElementById('table-search').value;
+
+            try {
+                const res = await fetch(`/api/industries?kecamatan=${kec}&kategori=${kat}&q=${encodeURIComponent(search)}`);
+                const json = await res.json();
+                allIndustries = json.data;
+
+                renderMapMarkers(allIndustries);
+                renderTable(allIndustries);
+            } catch (err) {
+                console.error("Error fetching industries:", err);
+            }
+        }
+
+        function renderMapMarkers(data) {
+            markersLayer.clearLayers();
+
+            data.forEach(item => {
+                const isSasirangan = item.kategori === 'Sasirangan & Batik';
+                const markerColor = isSasirangan ? '#d97706' : '#0284c7';
+
+                const customIcon = L.divIcon({
+                    className: 'custom-pin',
+                    html: `<div style="background-color: ${markerColor}; width: 12px; height: 12px; border-radius: 50%; border: 2px solid #ffffff; box-shadow: 0 0 10px ${markerColor};"></div>`,
+                    iconSize: [12, 12]
+                });
+
+                const marker = L.marker([item.lat, item.lng], { icon: customIcon });
+                marker.bindPopup(`
+                    <div style="font-family: Inter, sans-serif; padding: 2px;">
+                        <span style="font-size: 10px; font-weight: bold; color: ${markerColor}; text-transform: uppercase;">${item.kategori}</span>
+                        <h4 style="font-size: 13px; font-weight: bold; margin: 2px 0; color: #0f172a;">${item.nama}</h4>
+                        <p style="font-size: 11px; margin: 2px 0; color: #475569;"><strong>Pemilik:</strong> ${item.pemilik}</p>
+                        <p style="font-size: 11px; margin: 2px 0; color: #475569;"><strong>Kelurahan:</strong> ${item.kelurahan}, Kec. ${item.kecamatan}</p>
+                        <p style="font-size: 10px; margin-top: 4px; color: #64748b;"><strong>KBLI:</strong> ${item.kbli_nama}</p>
+                    </div>
+                `);
+                markersLayer.addLayer(marker);
+            });
+        }
+
+        function renderTable(data) {
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = '';
+            document.getElementById('table-count-label').innerText = `Menampilkan ${data.length} industri`;
+
+            data.slice(0, 50).forEach((item, idx) => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-100/60 dark:hover:bg-slate-800/40 transition';
+                tr.innerHTML = `
+                    <td class="px-4 py-3 text-slate-400 dark:text-slate-500">${idx + 1}</td>
+                    <td class="px-4 py-3 font-semibold text-slate-800 dark:text-slate-200">${item.nama}</td>
+                    <td class="px-4 py-3 text-slate-500 dark:text-slate-400">${item.pemilik}</td>
+                    <td class="px-4 py-3"><span class="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[10px] text-amber-800 dark:text-amber-300 font-medium">${item.kecamatan}</span></td>
+                    <td class="px-4 py-3 text-slate-700 dark:text-slate-300 font-medium">${item.kelurahan}</td>
+                    <td class="px-4 py-3 text-slate-500 dark:text-slate-400 max-w-xs truncate" title="${item.alamat}">${item.alamat}</td>
+                    <td class="px-4 py-3 text-amber-700 dark:text-amber-400 font-medium">${item.kbli_kode} - ${item.kbli_nama.substring(0, 27)}...</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function fetchStatsAndCharts() {
+            try {
+                const res = await fetch('/api/stats');
+                const stats = await res.json();
+
+                const ctxKec = document.getElementById('chartKecamatan').getContext('2d');
+                new Chart(ctxKec, {
+                    type: 'bar',
+                    data: {
+                        labels: Object.keys(stats.kecamatan_distribution),
+                        datasets: [{
+                            label: 'Jumlah Industri',
+                            data: Object.values(stats.kecamatan_distribution),
+                            backgroundColor: ['#d97706', '#059669', '#0284c7', '#7c3aed', '#db2777'],
+                            borderRadius: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { grid: { color: 'rgba(150,150,150,0.1)' }, ticks: { color: '#64748b' } },
+                            x: { grid: { display: false }, ticks: { color: '#64748b' } }
+                        }
+                    }
+                });
+
+                const ctxKel = document.getElementById('chartKelurahan').getContext('2d');
+                const kelLabels = Object.keys(stats.kelurahan_top10).slice(0, 6);
+                const kelData = Object.values(stats.kelurahan_top10).slice(0, 6);
+
+                new Chart(ctxKel, {
+                    type: 'doughnut',
+                    data: {
+                        labels: kelLabels,
+                        datasets: [{
+                            data: kelData,
+                            backgroundColor: ['#d97706', '#059669', '#0284c7', '#7c3aed', '#db2777', '#64748b'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'right', labels: { color: '#64748b', font: { size: 10 } } }
+                        }
+                    }
+                });
+
+            } catch (err) {
+                console.error("Error fetching stats:", err);
+            }
+        }
+
+        function setupEventListeners() {
+            const dropzone = document.getElementById('dropzone');
+            const fileInput = document.getElementById('file-input');
+
+            dropzone.onclick = () => fileInput.click();
+            fileInput.onchange = (e) => {
+                if (e.target.files.length > 0) classifyFile(e.target.files[0]);
+            };
+
+            dropzone.ondragover = (e) => { e.preventDefault(); dropzone.classList.add('border-amber-500'); };
+            dropzone.ondragleave = () => dropzone.classList.remove('border-amber-500');
+            dropzone.ondrop = (e) => {
+                e.preventDefault();
+                dropzone.classList.remove('border-amber-500');
+                if (e.dataTransfer.files.length > 0) classifyFile(e.dataTransfer.files[0]);
+            };
+
+            document.getElementById('map-filter-kecamatan').onchange = fetchIndustries;
+            document.getElementById('map-filter-kategori').onchange = fetchIndustries;
+            document.getElementById('table-search').oninput = fetchIndustries;
+        }
+    </script>
+</body>
+</html>

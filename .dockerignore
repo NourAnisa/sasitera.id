@@ -1,0 +1,15 @@
+﻿__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+.git
+.gitignore
+.dockerignore
+Dataset Motif Kain Sasirangan.zip
+Dataset Motif Kain Sasirangan/Raw
+*.docx
+*.pdf

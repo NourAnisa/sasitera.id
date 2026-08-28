@@ -1,0 +1,14 @@
+﻿version: '3.8'
+
+services:
+  sasirangan-ai:
+    build: .
+    container_name: sasirangan_ai_app
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=production
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./static/uploads:/app/static/uploads
+    restart: unless-stopped
