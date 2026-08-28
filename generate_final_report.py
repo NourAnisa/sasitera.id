@@ -179,6 +179,7 @@ add_paragraph("3. Mengembangkan platform web terintegrasi SASITERA.ID yang mengg
 add_paragraph("4. Menyusun rekomendasi kebijakan terukur dan matriks rencana aksi lintas Organisasi Perangkat Daerah (OPD) untuk akselerasi ekosistem ekonomi kreatif Kota Banjarmasin.", indent=0.4)
 
 doc.add_page_break()
+
 # -------------------------------------------------------------
 # 4. BAB II: DATA DAN METODOLOGI
 # -------------------------------------------------------------
@@ -517,7 +518,7 @@ for p_ref in pustaka:
 doc.add_page_break()
 
 # -------------------------------------------------------------
-# 9. LAMPIRAN
+# 9. LAMPIRAN (LENGKAP DENGAN DOKUMENTASI VISUAL & DATA)
 # -------------------------------------------------------------
 add_title("LAMPIRAN", size=12, bold=True, space_before=0, space_after=16)
 
@@ -526,7 +527,9 @@ add_paragraph("• Repositori GitHub Resmi: https://github.com/NourAnisa/sasiter
 add_paragraph("• Tautan Aplikasi Web Live (GitHub Pages): https://nouranisa.github.io/sasitera.id/", indent=0)
 add_paragraph("• Akun Media Sosial Resmi: https://www.instagram.com/sasitera.id/", indent=0)
 
-add_heading_2("Lampiran 2: Dokumentasi Antarmuka Platform SASITERA.ID")
+add_heading_2("Lampiran 2: Dokumentasi Visual Analisis Spasial & Platform SASITERA.ID")
+
+# Lampiran Gambar 1
 if os.path.exists("static/img/sasitera_brand.png"):
     doc.add_picture("static/img/sasitera_brand.png", width=Inches(3.8))
     p_l1 = doc.add_paragraph()
@@ -536,6 +539,75 @@ if os.path.exists("static/img/sasitera_brand.png"):
     r_l1.bold = True
     r_l1.font.size = Pt(9.5)
 
+# Lampiran Gambar 2 (Pareto)
+if os.path.exists("static/img/spasial_aglomerasi_kelurahan.png"):
+    doc.add_picture("static/img/spasial_aglomerasi_kelurahan.png", width=Inches(5.0))
+    p_l2 = doc.add_paragraph()
+    p_l2.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p_l2.paragraph_format.space_after = Pt(8)
+    r_l2 = p_l2.add_run("Lampiran Gambar 2: Kurva Pareto Aglomerasi Sentra Sasirangan Top 10 Kelurahan")
+    r_l2.bold = True
+    r_l2.font.size = Pt(9.5)
+
+# Lampiran Gambar 3 (KBLI)
+if os.path.exists("static/img/struktur_kbli_ekraf.png"):
+    doc.add_picture("static/img/struktur_kbli_ekraf.png", width=Inches(5.0))
+    p_l3 = doc.add_paragraph()
+    p_l3.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p_l3.paragraph_format.space_after = Pt(8)
+    r_l3 = p_l3.add_run("Lampiran Gambar 3: Struktur Rantai Pasok KBLI Industri Kreatif Tekstil")
+    r_l3.bold = True
+    r_l3.font.size = Pt(9.5)
+
+# Lampiran Gambar 4 (Training Curves)
+if os.path.exists("static/img/training_curves.png"):
+    doc.add_picture("static/img/training_curves.png", width=Inches(5.0))
+    p_l4 = doc.add_paragraph()
+    p_l4.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p_l4.paragraph_format.space_after = Pt(8)
+    r_l4 = p_l4.add_run("Lampiran Gambar 4: Kurva Pelatihan Akurasi dan Loss Model CNN MobileNetV2 (15 Epochs)")
+    r_l4.bold = True
+    r_l4.font.size = Pt(9.5)
+
+# Lampiran Gambar 5-8 (Motif Samples)
+if os.path.exists("static/samples/sample_gelombang_1.jpg"):
+    doc.add_picture("static/samples/sample_gelombang_1.jpg", width=Inches(3.2))
+    p_l5 = doc.add_paragraph()
+    p_l5.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p_l5.paragraph_format.space_after = Pt(8)
+    r_l5 = p_l5.add_run("Lampiran Gambar 5: Sampel Citra Uji Motif Gelombang Asli")
+    r_l5.bold = True
+    r_l5.font.size = Pt(9.5)
+
+if os.path.exists("static/samples/sample_hiris_pudak_1.jpg"):
+    doc.add_picture("static/samples/sample_hiris_pudak_1.jpg", width=Inches(3.2))
+    p_l6 = doc.add_paragraph()
+    p_l6.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p_l6.paragraph_format.space_after = Pt(8)
+    r_l6 = p_l6.add_run("Lampiran Gambar 6: Sampel Citra Uji Motif Hiris Pudak Asli")
+    r_l6.bold = True
+    r_l6.font.size = Pt(9.5)
+
+if os.path.exists("static/samples/sample_kembang_kacang_1.jpg"):
+    doc.add_picture("static/samples/sample_kembang_kacang_1.jpg", width=Inches(3.2))
+    p_l7 = doc.add_paragraph()
+    p_l7.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p_l7.paragraph_format.space_after = Pt(8)
+    r_l7 = p_l7.add_run("Lampiran Gambar 7: Sampel Citra Uji Motif Kembang Kacang Asli")
+    r_l7.bold = True
+    r_l7.font.size = Pt(9.5)
+
+if os.path.exists("static/samples/sample_turun_dayang_1.jpg"):
+    doc.add_picture("static/samples/sample_turun_dayang_1.jpg", width=Inches(3.2))
+    p_l8 = doc.add_paragraph()
+    p_l8.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p_l8.paragraph_format.space_after = Pt(8)
+    r_l8 = p_l8.add_run("Lampiran Gambar 8: Sampel Citra Uji Motif Turun Dayang Asli")
+    r_l8.bold = True
+    r_l8.font.size = Pt(9.5)
+
+# Save both to final name and also update Sistematika Laporan
 output_filename = "Laporan_Banjarmasin_Datathon_2026_SASITERA.docx"
 doc.save(output_filename)
-print(f"[✓] Dokumen laporan berhasil dibuat dan disimpan di: {output_filename}")
+doc.save("Sistematika Laporan - Banjarmasin Datathon 2026.docx")
+print(f"[✓] Dokumen laporan berhasil diupdate dan disimpan di: {output_filename} dan Sistematika Laporan - Banjarmasin Datathon 2026.docx")
